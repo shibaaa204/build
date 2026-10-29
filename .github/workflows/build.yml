@@ -23,7 +23,8 @@ jobs:
             pkgconf \
             wayland \
             libxkbcommon \
-            libdrm
+            libdrm \
+            mesa
 
       - name: Mark workspace safe for Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
