@@ -1,0 +1,45 @@
+name: Build Droidloom Wayland (Niri Patch)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          pacman -Syu --noconfirm --needed \
+            base-devel \
+            git \
+            rust \
+            cargo \
+            pkgconf \
+            wayland \
+            libxkbcommon \
+            libdrm
+
+      - name: Mark workspace safe for Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Checkout patched Droidloom repo
+        uses: actions/checkout@v4
+        with:
+          repository: clansty/droidloom
+          ref: niri-optional-syncobj-output-power
+
+      - name: Build droidloom-wayland binary
+        run: cargo build --release -p droidloom-wayland
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: droidloom-wayland-niri
+          path: target/release/droidloom-wayland
+          if-no-files-found: error
